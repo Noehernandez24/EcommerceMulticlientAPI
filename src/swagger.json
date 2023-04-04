@@ -1,0 +1,712 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "eCommerce Multiclient",
+    "description": "A multi-client ecommerce api where people can sell and buy online!",
+    "contact": {
+      "email": "evilld94@gmail.com"
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/user": {
+      "post": {
+        "tags": ["users"],
+        "description": "create a new user",
+        "summary": "create a new user",
+        "requestBody": {
+          "description": "The fields to create a new user are: username, email, password and role (optional) if the role property is not added it will be given a customer role automatically",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/createUser" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created"
+          },
+          "409": {
+            "description": "conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "validation error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Database conection error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["users"],
+        "description": "update username or avatar",
+        "summary": "update username / avatar",
+        "requestBody": {
+          "description": "The fields to update username or avatar are: username, avatar",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/updateUser" }
+            }
+          }
+        },
+        "security": [
+          {
+            "jwtAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User updated successfully"
+          },
+          "400": {
+            "description": "Invalid request data provided"
+          },
+          "401": {
+            "description": "Unauthorized access"
+          },
+          "403": {
+            "description": "Forbidden access"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": ["users"],
+        "description": "login a user",
+        "summary": "login a user",
+        "requestBody": {
+          "description": "The fields to login an user are: email and password",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/loginUser" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "example": "noe94"
+                    },
+                    "email": {
+                      "type": "string",
+                      "example": "noe@gmail.com"
+                    },
+                    "password": {
+                      "type": "string",
+                      "example": "noe1234567"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": ["admin", "seller", "client"],
+                      "example": "client"
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid credentials"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/product": {
+      "get": {
+        "tags": ["products"],
+        "description": "Get all products",
+        "summary": "GET all products",
+        "responses": {
+          "200": {
+            "description": "The request was successful and a list of all available products is returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "price": {
+                        "type": "number"
+                      },
+                      "availableQty": {
+                        "type": "integer"
+                      },
+                      "status": {
+                        "type": "boolean"
+                      },
+                      "userId": {
+                        "type": "integer"
+                      },
+                      "productImg": {
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "seller": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "username": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request cannot be authenticated or the user does not have permission to access this information."
+          },
+          "404": {
+            "description": "The request was made to a nonexistent route."
+          },
+          "500": {
+            "description": "An internal server error occurred while processing the request."
+          }
+        }
+      },
+      "post": {
+        "tags": ["products"],
+        "description": "Create a new product",
+        "summary": "Create a new product",
+        "requestBody": {
+          "description": "The fields to create a new product are: name, description, price, availableQty, productImg",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/createProduct" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product created successfully."
+          },
+          "400": {
+            "description": "Invalid request data provided."
+          },
+          "401": {
+            "description": "Unauthorized access."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "security": [
+          {
+            "jwtAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/product/{id}": {
+      "put": {
+        "tags": ["products"],
+        "description": "Edit the description of a product",
+        "summary": "Update description of a product",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "product id to update"
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/updateProduct" }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Product updated successfully."
+          },
+          "400": {
+            "description": "Invalid request data provided."
+          },
+          "401": {
+            "description": "Unauthorized access."
+          },
+          "403": {
+            "description": "Forbidden access."
+          },
+          "404": {
+            "description": "Product not found."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "security": [
+          {
+            "jwtAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/product/cart/user": {
+      "get": {
+        "tags": ["cart"],
+        "description": "Get user cart",
+        "summary": "Get user cart",
+        "responses": {
+          "200": {
+            "description": "Cart retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cart"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access."
+          },
+          "403": {
+            "description": "Forbidden access."
+          },
+          "404": {
+            "description": "Cart not found."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "security": [
+          {
+            "jwtAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/product/addcart": {
+      "post": {
+        "tags": ["cart"],
+        "description": "Add product to cart",
+        "summary": "Add product to cart",
+        "requestBody": {
+          "description": "The fields to add product to your cart are: productId, quantity",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/addProductCart" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product added successfully to the cart."
+          },
+          "400": {
+            "description": "Invalid request data provided."
+          },
+          "401": {
+            "description": "Unauthorized access."
+          },
+          "403": {
+            "description": "Forbidden access."
+          },
+          "404": {
+            "description": "Product not found."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "security": [
+          {
+            "jwtAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/cart/product/{id}": {
+      "delete": {
+        "tags": ["cart"],
+        "description": "Delete a product",
+        "summary": "Delete a product",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "product id to delete"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Product deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized access"
+          },
+          "403": {
+            "description": "Forbidden access"
+          },
+          "404": {
+            "description": "Product not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "jwtAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/purcharse": {
+      "get": {
+        "tags": ["purchase"],
+        "description": "get all purchases",
+        "summary": "Get purchases",
+        "responses": {
+          "200": {
+            "description": "List of purchases retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "totalPrice": {
+                        "type": "number"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "status": {
+                        "type": "boolean"
+                      },
+                      "products": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "price": {
+                              "type": "number"
+                            },
+                            "productImg": {
+                              "type": "string"
+                            },
+                            "quantity": {
+                              "type": "object",
+                              "properties": {
+                                "quantity": {
+                                  "type": "integer"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access."
+          },
+          "403": {
+            "description": "Forbidden access."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "security": [
+          {
+            "jwtAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["purchase"],
+        "description": "make a purchase",
+        "summary": "make a purcharse",
+        "responses": {
+          "201": {
+            "description": "Purchase made successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "A success message to indicate the purchase was made successfully."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data provided."
+          },
+          "401": {
+            "description": "Unauthorized access."
+          },
+          "403": {
+            "description": "Forbidden access."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "security": [
+          {
+            "jwtAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "createUser": {
+        "description": "The role value can be ignored and will be added with default client role",
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "noe94"
+          },
+          "email": {
+            "type": "string",
+            "example": "noe@gmail.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "noe1234567"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["admin", "seller", "client"],
+            "example": "client"
+          }
+        }
+      },
+      "updateUser": {
+        "description": "for update email or avatar to an user you need a token",
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "noe94"
+          },
+          "avatar": {
+            "type": "string",
+            "example": "https://www.example-avatar.img"
+          }
+        }
+      },
+      "loginUser": {
+        "description": "To log in you need an email and password",
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "noe@gmail.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "noe1234567"
+          }
+        }
+      },
+      "createProduct": {
+        "description": "The fields to create a new product are: name, description, price, availableQty, productImg",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "PS5"
+          },
+          "description": {
+            "type": "string",
+            "example": "Playstation 5"
+          },
+          "price": {
+            "type": "float",
+            "example": 1000
+          },
+          "availableQty": {
+            "type": "integer",
+            "example": 53
+          },
+          "productImg": {
+            "type": "string",
+            "example": "https://images.example.com/wireless-headphones.jpg"
+          }
+        }
+      },
+      "updateProduct": {
+        "description": "The field to update a product is description",
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "example": "The PS5 gold edition is here!"
+          }
+        }
+      },
+      "Cart": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Cart ID"
+          },
+          "totalPrice": {
+            "type": "number",
+            "description": "Total price of all products in cart"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "Product ID"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Product name"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Product description"
+                },
+                "price": {
+                  "type": "number",
+                  "description": "Product price"
+                },
+                "quantity": {
+                  "type": "integer",
+                  "description": "Quantity of product in cart"
+                }
+              }
+            }
+          }
+        }
+      },
+      "addProductCart": {
+        "description": "The fields to add product in your cart are: productId, quantity",
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "integer",
+            "example": 1
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 2
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "jwtAuth": {
+        "type": "apiKey",
+        "name": "access-token",
+        "in": "header",
+        "description": "JWT token for API authentication"
+      }
+    }
+  }
+}
