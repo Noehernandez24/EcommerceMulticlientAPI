@@ -4,7 +4,6 @@ const Products = require("../models/products.model")
 const ProductsInOrder = require("../models/productsInOrder")
 const ProductInCartServices = require("../services/carts.services")
 const OrdersServices = require("../services/orders.services")
-const { htmlPurchased } = require("../utils/htmlTemplate")
 const transporter = require("../utils/mailer");
 
 const getPurcharses = async (req, res, next) => {

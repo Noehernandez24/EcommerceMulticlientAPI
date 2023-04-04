@@ -1,5 +1,4 @@
 const UsersServices = require("../services/users.services");
-const HtmlGen = require("../utils/htmlTemplate");
 const transporter = require("../utils/mailer");
 require("dotenv").config();
 
