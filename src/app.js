@@ -11,7 +11,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 initModels()
 
-app.use('/docs', swaggerui.serve, swaggerui.setup(swaggerDoc))
+app.use('/', swaggerui.serve, swaggerui.setup(swaggerDoc))
 app.use(express.json())
 app.use(cors())
 app.use(morgan('dev'))
